@@ -20,11 +20,13 @@ suite('Functional Tests', function() {
       test('1 stock', function(done) {
        chai.request(server)
         .get('/api/stock-prices')
-        .query({stock: 'goog'})
+        .query({stock: 'msft'})
         .end(function(err, res){
           console.log(`response from GET 'api/stock-prices': `, res.body)
-          //complete this one too
-          
+          assert.equal(res.body.stock, 'MSFT');
+          assert.equal(res.body.price, '135.28');
+          assert.equal(res.body.likes, 1);
+          assert.isArray(res.body.ipAddresses);
           done();
         });
       });
@@ -32,11 +34,12 @@ suite('Functional Tests', function() {
       test('1 stock with like', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
-        .query({stock: 'goog', like: true})
+        .query({stock: 'msft', like: true})
         .end(function(err, res){
-          
-          //complete this one too
-          
+          assert.equal(res.body.stock, 'MSFT');
+          assert.equal(res.body.price, '135.28');
+          assert.equal(res.body.likes, 1);
+          assert.isArray(res.body.ipAddresses);
           done();
         });
       });
@@ -44,11 +47,12 @@ suite('Functional Tests', function() {
       test('1 stock with like again (ensure likes arent double counted)', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
-        .query({stock: 'goog', like: true})
+        .query({stock: 'msft', like: true})
         .end(function(err, res){
-          
-          //complete this one too
-          
+          assert.equal(res.body.stock, 'MSFT');
+          assert.equal(res.body.price, '135.28');
+          assert.equal(res.body.likes, 1)
+          assert.isArray(res.body.ipAddresses);
           done();
         });
       });
@@ -56,11 +60,16 @@ suite('Functional Tests', function() {
       test('2 stocks', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
-        .query({stock: ['goog','msft']})
+        .query({stock: ['msft','goog']})
         .end(function(err, res){
-          
-          //complete this one too
-          
+          assert.equal(res.body.stock, 'MSFT');
+          assert.equal(res.body.stock, 'GOOG');
+          assert.isArray(res.body.price);
+          assert.equal(res.body.price[0], '135.28');
+          assert.equal(res.body.price[1], '1173.99');
+          assert.equal(res.body.likes[0], 1);
+          assert.equal(res.body.likes[1], 0);
+          assert.isArray(res.body.ipAddresses);
           done();
         });
       });
@@ -68,10 +77,16 @@ suite('Functional Tests', function() {
       test('2 stocks with like', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
-        .query({stock: ['goog','msft'], like: true})
+        .query({stock: ['msft','goog'], like: true})
         .end(function(err, res){
-          
-          //complete this one too
+          assert.equal(res.body.stock, 'MSFT');
+          assert.equal(res.body.stock, 'GOOG');
+          assert.isArray(res.body.price);
+          assert.equal(res.body.price[0], '135.28');
+          assert.equal(res.body.price[1], '1173.99');
+          assert.equal(res.body.likes[0], 1);
+          assert.equal(res.body.likes[1], 1);
+          assert.isArray(res.body.ipAddresses);
           
           done();
         });

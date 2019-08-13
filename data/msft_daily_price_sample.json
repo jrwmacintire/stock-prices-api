@@ -1,0 +1,32 @@
+{
+    "Meta Data": {
+        "1. Information": "Daily Prices (open, high, low, close) and Volumes",
+        "2. Symbol": "MSFT",
+        "3. Last Refreshed": "2019-08-07",
+        "4. Output Size": "Compact",
+        "5. Time Zone": "US/Eastern"
+    },
+    "Time Series (Daily)": {
+        "2019-08-07": {
+            "1. open": "133.7900",
+            "2. high": "135.6500",
+            "3. low": "131.8284",
+            "4. close": "135.2800",
+            "5. volume": "26682074"
+        },
+        "2019-08-06": {
+            "1. open": "133.8000",
+            "2. high": "135.6800",
+            "3. low": "133.2100",
+            "4. close": "134.6900",
+            "5. volume": "32670900"
+        },
+        "2019-08-05": {
+            "1. open": "133.3000",
+            "2. high": "133.9300",
+            "3. low": "130.7800",
+            "4. close": "132.2100",
+            "5. volume": "42749600"
+        }
+    }
+}
