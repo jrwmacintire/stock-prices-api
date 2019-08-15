@@ -1,23 +1,25 @@
 {
-  "name": "my-hyperdev-app",
+  "name": "stock-price-api",
   "version": "0.0.1",
-  "description": "What am I about?",
+  "description": "Stock Price API. Created with A",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "nodemon server.js localhost 3000"
   },
   "dependencies": {
-    "express": "^4.14.0",
-    "cors": "^2.8.5",
     "body-parser": "^1.19.0",
     "chai": "^4.2.0",
-    "mongodb": "^3.2.7",
     "chai-http": "^4.3.0",
-    "mocha": "^6.2.0",
-    "zombie": "^6.1.4",
+    "cors": "^2.8.5",
+    "dotenv": "^8.0.0",
+    "express": "^4.14.0",
     "helmet": "^3.20.0",
+    "mocha": "^6.2.0",
+    "mongodb": "^3.2.7",
+    "mongoose": "^5.6.9",
     "node-fetch": "^2.6.0",
-    "mongoose": "^5.6.9"
+    "nodemon": "^1.19.1",
+    "zombie": "^6.1.4"
   },
   "engines": {
     "node": "4.4.3"
@@ -31,5 +33,10 @@
     "hyperdev",
     "express"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "author": "John MacIntire"
 }
