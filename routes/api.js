@@ -36,21 +36,21 @@ module.exports = function(app) {
     const stock = new Stock({
       stock: stockName.toUpperCase(),
       price: 135.28,
-      likes: 1,
+      likes: 0,
       price_updated: Date.now(),
       ipAddresses: [ipAddress]
     });
 
-    const response = {
+    const stockData = {
       stock: 'MSFT',
       price: 135.28,
       likes: 1
     };
 
-    // const response = {
+    // const stockData = {
     //   stock: stockName,
-    //   price: getPrice,
-    //   likes: getLikes
+    //   price: stock.getPrice(),
+    //   likes: stock.getLikes()
     // };
 
     // Connect to MongoDB instance with Mongoose.
@@ -62,7 +62,7 @@ module.exports = function(app) {
     db.once('open', function() {
       console.log(`Connected to DB!`);
       
-      res.send(response);
+      res.send(stockData);
     });
   
   });

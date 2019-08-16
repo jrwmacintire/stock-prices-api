@@ -25,7 +25,7 @@ suite('Functional Tests', function() {
           // console.log(`response from GET 'api/stock-prices': `, res.body);
           assert.equal(res.body.stock, 'MSFT');
           assert.equal(res.body.price, 135.28);
-          assert.equal(res.body.likes, 1);
+          assert.equal(res.body.likes, 0);
           done();
         });
       });
