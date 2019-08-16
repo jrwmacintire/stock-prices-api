@@ -22,7 +22,7 @@ suite('Functional Tests', function() {
         .get('/api/stock-prices')
         .query({stock: 'msft'})
         .end(function(err, res){
-          // console.log(`response from GET 'api/stock-prices': `, res.body)
+          // console.log(`response from GET 'api/stock-prices': `, res.body);
           assert.equal(res.body.stock, 'MSFT');
           assert.equal(res.body.price, 135.28);
           assert.equal(res.body.likes, 1);

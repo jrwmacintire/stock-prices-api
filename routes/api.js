@@ -30,7 +30,7 @@ module.exports = function(app) {
 
   app.route("/api/stock-prices").get(function(req, res) {
     const stockName = req.query.stock.toUpperCase(),
-          ipAddress = req.host,
+          ipAddress = req.hostname,
           stockType = typeof req.query.stock;
     
     const stock = new Stock({
@@ -41,12 +41,10 @@ module.exports = function(app) {
       ipAddresses: [ipAddress]
     });
 
-    stock.save(function(err) { if(err) console.log(err); });
-
     const response = {
       stock: 'MSFT',
-      price: '135.28',
-      likes: '1'
+      price: 135.28,
+      likes: 1
     };
 
     // const response = {
@@ -55,7 +53,17 @@ module.exports = function(app) {
     //   likes: getLikes
     // };
 
-    res.send(response);
+    // Connect to MongoDB instance with Mongoose.
+    mongoose.connect(DB_URL, { useNewUrlParser: true });
+    const db = mongoose.connection;
+
+    db.on('error', console.error.bind(console, 'MongoDB connection error!'));
+
+    db.once('open', function() {
+      console.log(`Connected to DB!`);
+      
+      res.send(response);
+    });
   
   });
 
