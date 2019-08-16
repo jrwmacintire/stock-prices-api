@@ -22,11 +22,10 @@ suite('Functional Tests', function() {
         .get('/api/stock-prices')
         .query({stock: 'msft'})
         .end(function(err, res){
-          console.log(`response from GET 'api/stock-prices': `, res.body)
+          // console.log(`response from GET 'api/stock-prices': `, res.body)
           assert.equal(res.body.stock, 'MSFT');
-          assert.equal(res.body.price, '135.28');
+          assert.equal(res.body.price, 135.28);
           assert.equal(res.body.likes, 1);
-          assert.isArray(res.body.ipAddresses);
           done();
         });
       });
@@ -37,9 +36,8 @@ suite('Functional Tests', function() {
         .query({stock: 'msft', like: true})
         .end(function(err, res){
           assert.equal(res.body.stock, 'MSFT');
-          assert.equal(res.body.price, '135.28');
+          assert.equal(res.body.price, 135.28);
           assert.equal(res.body.likes, 1);
-          assert.isArray(res.body.ipAddresses);
           done();
         });
       });
@@ -50,9 +48,8 @@ suite('Functional Tests', function() {
         .query({stock: 'msft', like: true})
         .end(function(err, res){
           assert.equal(res.body.stock, 'MSFT');
-          assert.equal(res.body.price, '135.28');
+          assert.equal(res.body.price, 135.28);
           assert.equal(res.body.likes, 1)
-          assert.isArray(res.body.ipAddresses);
           done();
         });
       });
@@ -65,11 +62,10 @@ suite('Functional Tests', function() {
           assert.equal(res.body.stock, 'MSFT');
           assert.equal(res.body.stock, 'GOOG');
           assert.isArray(res.body.price);
-          assert.equal(res.body.price[0], '135.28');
-          assert.equal(res.body.price[1], '1173.99');
+          assert.equal(res.body.price[0], 135.28);
+          assert.equal(res.body.price[1], 1173.99);
           assert.equal(res.body.likes[0], 1);
           assert.equal(res.body.likes[1], 0);
-          assert.isArray(res.body.ipAddresses);
           done();
         });
       });
@@ -82,11 +78,10 @@ suite('Functional Tests', function() {
           assert.equal(res.body.stock, 'MSFT');
           assert.equal(res.body.stock, 'GOOG');
           assert.isArray(res.body.price);
-          assert.equal(res.body.price[0], '135.28');
-          assert.equal(res.body.price[1], '1173.99');
+          assert.equal(res.body.price[0], 135.28);
+          assert.equal(res.body.price[1], 1173.99);
           assert.equal(res.body.likes[0], 1);
           assert.equal(res.body.likes[1], 1);
-          assert.isArray(res.body.ipAddresses);
           
           done();
         });
