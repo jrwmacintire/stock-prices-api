@@ -22,30 +22,36 @@ const Stock = require("../models/Stock.js");
 const StockHandler = require("../controllers/stockHandler.js");
 const stockHandler = new StockHandler();
 
-const validateStock = require("../lib/validateStock.js");
-
 const DB_URL = process.env.DB_URL;
 
 module.exports = function(app) {
 
   app.route("/api/stock-prices").get(function(req, res) {
-    const stockName = req.query.stock.toUpperCase(),
+    const stockQuery = req.query.stock,
           ipAddress = req.hostname,
           stockType = typeof req.query.stock;
-    
-    const stock = new Stock({
-      stock: stockName.toUpperCase(),
-      price: 135.28,
-      likes: 0,
-      price_updated: Date.now(),
-      ipAddresses: [ipAddress]
-    });
 
-    const stockData = {
-      stock: 'MSFT',
-      price: 135.28,
-      likes: 1
-    };
+    let stockData;
+
+    if(stockType === 'string') {
+      const stockName = stockQuery.toUpperCase();
+
+      // validate 'stockName' with call to controller
+
+      // 'stockName' => { validInDB: Bool, validInAPI: Bool, docFound: Stock model }
+      const validateStock = stockHandler.validateStock(stockName);
+
+      const stock = new Stock({
+        stock: stockName,
+        price: stockHandler.getPrice(stockName),
+        likes: 0,
+        price_updated: Date.now(),
+        ipAddresses: [ipAddress]
+      });
+
+    } else if(stockType === 'array') {
+      console.log('somethinggninggingi');
+    }
 
     // const stockData = {
     //   stock: stockName,
@@ -53,38 +59,36 @@ module.exports = function(app) {
     //   likes: stock.getLikes()
     // };
 
+    stockData = {
+      stock: 'MSFT',
+      price: 135.28,
+      likes: 1
+    };
+    
+    // Return 'stockData' obj.: 'stock', 'price', and 'likes'/'rel_likes'
+    res.send(stockData);
+    
+
     // Connect to MongoDB instance with Mongoose.
-    mongoose.connect(DB_URL, { useNewUrlParser: true });
-    const db = mongoose.connection;
+    // mongoose.connect(DB_URL, { useNewUrlParser: true });
+    // const db = mongoose.connection;
 
-    db.on('error', console.error.bind(console, 'MongoDB connection error!'));
+    // db.on('error', console.error.bind(console, 'MongoDB connection error!'));
 
-    db.once('open', function() {
-      console.log(`Connected to DB!`);
+    // db.once('open', function() {
+    //   console.log(`Connected to DB!`);
+
+    //   stockData = {
+    //     stock: 'MSFT',
+    //     price: 135.28,
+    //     likes: 1
+    //   };
       
-      res.send(stockData);
-    });
+    //   // Return 'stockData' obj.: 'stock', 'price', and 'likes'/'rel_likes'
+    //   res.send(stockData);
+
+    // });
   
   });
-
-  // app.route("/api/stock-prices").get(function(req, res) {
-  //   // console.log(`req.query: `, req.query);
-  //   // res.send(req.query);
-  //   // console.log(typeof req.query.stock);
-
-  //   const queryStock = req.query.stock;
-  //   const ipAddress = req.host;
-
-  //   mongoose.connect(DB_URL, { useNewUrlParser: true });
-  //   const db = mongoose.connection;
-  //   const stockName = req.query.stock;
-  //   const stock = new Stock({
-  //     stock: stockName.toUpperCase(),
-  //     price: 135.28,
-  //     likes: 1,
-  //     price_updated: { type: Date, default: new Date() },
-  //     ipAddresses: [ipAddress]
-  //   });
-  // });
 
 };

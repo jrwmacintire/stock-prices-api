@@ -59,8 +59,8 @@ suite('Functional Tests', function() {
         .get('/api/stock-prices')
         .query({stock: ['msft','goog']})
         .end(function(err, res){
-          assert.equal(res.body.stock, 'MSFT');
-          assert.equal(res.body.stock, 'GOOG');
+          assert.equal(res.body.stock[0], 'MSFT');
+          assert.equal(res.body.stock[1], 'GOOG');
           assert.isArray(res.body.price);
           assert.equal(res.body.price[0], 135.28);
           assert.equal(res.body.price[1], 1173.99);
@@ -75,8 +75,8 @@ suite('Functional Tests', function() {
         .get('/api/stock-prices')
         .query({stock: ['msft','goog'], like: true})
         .end(function(err, res){
-          assert.equal(res.body.stock, 'MSFT');
-          assert.equal(res.body.stock, 'GOOG');
+          assert.equal(res.body.stock[0], 'MSFT');
+          assert.equal(res.body.stock[1], 'GOOG');
           assert.isArray(res.body.price);
           assert.equal(res.body.price[0], 135.28);
           assert.equal(res.body.price[1], 1173.99);

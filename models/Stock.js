@@ -13,8 +13,8 @@ const stockSchema = new Schema(
 
 // stockSchema.methods.test = () => { console.log('testing the schema method') };
 
-stockSchema.methods.getPrice = () => { console.log(`Getting price from Stock model!`); };
+// stockSchema.methods.getPrice = () => { console.log(`Getting price from Stock model!`); };
 
-stockSchema.methods.getLikes = () => { console.log(`Getting likes from Stock model!`); };
+// stockSchema.methods.getLikes = () => { console.log(`Getting likes from Stock model!`); };
 
 module.exports = mongoose.model('Stock', stockSchema);
