@@ -33,12 +33,19 @@ module.exports = function(app) {
 
     let stockData;
 
+    // TEST INFO
+    stockData = {
+      stock: 'MSFT',
+      price: 135.28,
+      likes: 1
+    };
+
     if(stockType === 'string') {
       const stockName = stockQuery.toUpperCase();
 
       // validate 'stockName' with call to controller
 
-      // 'stockName' => { validInDB: Bool, validInAPI: Bool, docFound: Stock model }
+      // 'stockName' => { validInDB: Bool, validInAPI: Bool, doc: Stock model, api: data }
       const validateStock = stockHandler.validateStock(stockName);
 
       const stock = new Stock({
@@ -49,8 +56,8 @@ module.exports = function(app) {
         ipAddresses: [ipAddress]
       });
 
-    } else if(stockType === 'array') {
-      console.log('somethinggninggingi');
+    } else if(stockType === 'object') {
+      console.log('somethinggninggingiffffffdsfsdfadsf');
     }
 
     // const stockData = {
@@ -59,15 +66,10 @@ module.exports = function(app) {
     //   likes: stock.getLikes()
     // };
 
-    stockData = {
-      stock: 'MSFT',
-      price: 135.28,
-      likes: 1
-    };
-    
-    // Return 'stockData' obj.: 'stock', 'price', and 'likes'/'rel_likes'
+
+    // Return 'stockData' object: 'stock', 'price', and 'likes'/'rel_likes'
     res.send(stockData);
-    
+
 
     // Connect to MongoDB instance with Mongoose.
     // mongoose.connect(DB_URL, { useNewUrlParser: true });
