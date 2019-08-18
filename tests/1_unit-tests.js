@@ -1,18 +1,24 @@
 /*
-*
-*
-*       FILL IN EACH UNIT TEST BELOW COMPLETELY
-*       -----[Keep the tests in the same order!]----
-*       (if additional are added, keep them at the very end!)
-*/
+ *
+ *
+ *       FILL IN EACH UNIT TEST BELOW COMPLETELY
+ *       -----[Keep the tests in the same order!]----
+ *       (if additional are added, keep them at the very end!)
+ */
 
-var chai = require('chai');
-var StockHandler = require('../controllers/stockHandler.js');
+var chai = require("chai");
+const assert = require('assert');
+var StockHandler = require("../controllers/stockHandler.js");
 
-var stockPrices = new StockHandler();
+var stockHandler = new StockHandler();
 
-suite('Unit Tests', function(){
+suite("Unit Tests", function() {
+  // none required
 
-//none requiered
+  describe('#validateStock()', () => {
+     it('should return a truthy value', function() {
+         assert.ok(stockHandler.validateStock('test'));
+     });
+  });
 
 });

@@ -13,7 +13,7 @@ var server = require('../server');
 
 chai.use(chaiHttp);
 
-suite('Functional Tests', function() {
+suite('\nFunctional Tests', function() {
     
     suite('GET /api/stock-prices => stockData object', function() {
       
