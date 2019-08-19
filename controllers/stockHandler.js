@@ -2,6 +2,8 @@ const fetch = require("node-fetch");
 const path = require("path");
 const mongoose = require('mongoose');
 
+const Stock = require('../models/Stock.js');
+
 const DB_URL = process.env.DB_URL;
 
 function StockHandler() {
@@ -25,7 +27,7 @@ function StockHandler() {
 
   // (name) => { valid: Bool, doc: Stock obj. }
   this.validateStockWithDB = function(name) {
-    console.log(`this.validateStockWithDB - name: ${name}`);
+    // console.log(`this.validateStockWithDB - name: ${name}`);
 
     // Connect to MongoDB instance with Mongoose.
     mongoose.connect(DB_URL, { useNewUrlParser: true });
@@ -35,10 +37,9 @@ function StockHandler() {
 
     db.once('open', function() {
       console.log(`Connected to DB!`);
-      return {
-        valid: false,
-        doc: null
-      };
+      
+      return;
+
     });
 
     // const query;
@@ -51,8 +52,8 @@ function StockHandler() {
   };
 
   // (name) => { valid: Bool, apiData: JSON data from API match }
-  this.validateStockWithAPI = async function(name) {
-    console.log(`this.validateStockWithAPI - name: ${name}`);
+  this.validateStockWithAPI = function(name) {
+    // console.log(`this.validateStockWithAPI - name: ${name}`);
 
     // const apiJson = await fetch('http://localhost:3000/data/search_sample.json')
     //   .then(res => res.json())

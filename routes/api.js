@@ -48,16 +48,24 @@ module.exports = function(app) {
       // 'stockName' => { validInDB: Bool, validInAPI: Bool, doc: Stock model, api: data }
       const validateStock = stockHandler.validateStock(stockName);
 
-      const stock = new Stock({
-        stock: stockName,
-        price: stockHandler.getPrice(stockName),
-        likes: 0,
-        price_updated: Date.now(),
-        ipAddresses: [ipAddress]
-      });
+      // const stock = new Stock({
+      //   stock: stockName,
+      //   price: stockHandler.getPrice(stockName),
+      //   likes: 0,
+      //   price_updated: Date.now(),
+      //   ipAddresses: [ipAddress]
+      // });
+
+      res.send(stockData);
 
     } else if(stockType === 'object') {
-      console.log('somethinggninggingiffffffdsfsdfadsf');
+      // console.log('');
+
+      const validateStock1 = stockHandler.validateStock(stockQuery[0]);
+      const validateStock2 = stockHandler.validateStock(stockQuery[1]);
+
+      res.send([stockData, stockData]);
+
     }
 
     // const stockData = {
@@ -68,7 +76,6 @@ module.exports = function(app) {
 
 
     // Return 'stockData' object: 'stock', 'price', and 'likes'/'rel_likes'
-    res.send(stockData);
 
 
     // Connect to MongoDB instance with Mongoose.
