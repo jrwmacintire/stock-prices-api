@@ -13,7 +13,7 @@ const MongoClient = require("mongodb");
 const mongoose = require("mongoose");
 const os = require("os");
 
-require('dotenv').config();
+require("dotenv").config();
 
 // Model
 const Stock = require("../models/Stock.js");
@@ -25,28 +25,16 @@ const stockHandler = new StockHandler();
 const DB_URL = process.env.DB_URL;
 
 module.exports = function(app) {
-
   app.route("/api/stock-prices").get(function(req, res) {
     const stockQuery = req.query.stock,
-          ipAddress = req.hostname,
-          stockType = typeof req.query.stock;
+      ipAddress = req.hostname,
+      stockType = typeof req.query.stock;
 
     let stockData;
 
-    // TEST INFO
-    stockData = {
-      stock: 'MSFT',
-      price: 135.28,
-      likes: 1
-    };
-
-    if(stockType === 'string') {
+    if (stockType === "string") {
       const stockName = stockQuery.toUpperCase();
-
-      // validate 'stockName' with call to controller
-
-      // 'stockName' => { validInDB: Bool, validInAPI: Bool, doc: Stock model, api: data }
-      const validateStock = stockHandler.validateStock(stockName);
+      const validationResult = stockHandler.validateStock(stockName);
 
       // const stock = new Stock({
       //   stock: stockName,
@@ -56,48 +44,50 @@ module.exports = function(app) {
       //   ipAddresses: [ipAddress]
       // });
 
+      stockData = {
+        stock: stockName,
+        price: stockHandler.getPrice(),
+        likes: stockHandler.getLikes()
+      }
+
       res.send(stockData);
 
-    } else if(stockType === 'object') {
+    } else if (stockType === "object") {
+      const stockName1 = stockQuery[0],
+            stockName2 = stockQuery[1];
+
+      const validationResult1 = stockHandler.validateStock(stockName);
+      const validationResult2 = stockHandler.validateStock(stockName);
+
       // console.log('');
+      // const stock1 = new Stock({
+      //   stock: stockName1,
+      //   price: stockHandler.getPrice(stockName1),
+      //   likes: 0,
+      //   price_updated: Date.now(),
+      //   ipAddresses: [ipAddress]
+      // });
 
-      const validateStock1 = stockHandler.validateStock(stockQuery[0]);
-      const validateStock2 = stockHandler.validateStock(stockQuery[1]);
+      // const stock2 = new Stock({
+      //   stock: stockName1,
+      //   price: stockHandler.getPrice(stockName1),
+      //   likes: 0,
+      //   price_updated: Date.now(),
+      //   ipAddresses: [ipAddress]
+      // });
 
+      const stockData = {
+        stock: stock1,
+        price: stockHandler.getPrice(),
+        rel_likes: stockHandler.convertRelativeLikes()
+      };
+      
       res.send([stockData, stockData]);
 
+    } else {
+      throw Error(`Query contains a faulty value.`);
     }
-
-    // const stockData = {
-    //   stock: stockName,
-    //   price: stock.getPrice(),
-    //   likes: stock.getLikes()
-    // };
-
-
-    // Return 'stockData' object: 'stock', 'price', and 'likes'/'rel_likes'
-
-
-    // Connect to MongoDB instance with Mongoose.
-    // mongoose.connect(DB_URL, { useNewUrlParser: true });
-    // const db = mongoose.connection;
-
-    // db.on('error', console.error.bind(console, 'MongoDB connection error!'));
-
-    // db.once('open', function() {
-    //   console.log(`Connected to DB!`);
-
-    //   stockData = {
-    //     stock: 'MSFT',
-    //     price: 135.28,
-    //     likes: 1
-    //   };
-      
-    //   // Return 'stockData' obj.: 'stock', 'price', and 'likes'/'rel_likes'
-    //   res.send(stockData);
-
-    // });
-  
+    // Return 'stockData' obj.: 'stock', 'price', and 'likes'/'rel_likes'
+    // res.send(stockData);
   });
-
 };

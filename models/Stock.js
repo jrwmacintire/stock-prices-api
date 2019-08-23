@@ -11,7 +11,7 @@ const stockSchema = new Schema(
   }
 );
 
-// stockSchema.methods.test = () => { console.log('testing the schema method') };
+stockSchema.methods.test = () => { console.log('testing the schema method') };
 
 // stockSchema.methods.getPrice = () => { console.log(`Getting price from Stock model!`); };
 

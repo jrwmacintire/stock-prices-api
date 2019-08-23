@@ -20,11 +20,11 @@ suite('\nFunctional Tests', function() {
       test('1 stock', function(done) {
        chai.request(server)
         .get('/api/stock-prices')
-        .query({stock: 'msft'})
+        .query({stock: 'test'})
         .end(function(err, res){
           // console.log(`response from GET 'api/stock-prices': `, res.body);
-          assert.equal(res.body.stock, 'MSFT');
-          assert.equal(res.body.price, 135.28);
+          assert.equal(res.body.stock, 'TEST');
+          assert.equal(res.body.price, 100.00);
           assert.equal(res.body.likes, 0);
           done();
         });
@@ -33,10 +33,10 @@ suite('\nFunctional Tests', function() {
       test('1 stock with like', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
-        .query({stock: 'msft', like: true})
+        .query({stock: 'test', like: true})
         .end(function(err, res){
-          assert.equal(res.body.stock, 'MSFT');
-          assert.equal(res.body.price, 135.28);
+          assert.equal(res.body.stock, 'TEST');
+          assert.equal(res.body.price, 100.00);
           assert.equal(res.body.likes, 1);
           done();
         });
@@ -45,10 +45,10 @@ suite('\nFunctional Tests', function() {
       test('1 stock with like again (ensure likes arent double counted)', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
-        .query({stock: 'msft', like: true})
+        .query({stock: 'test', like: true})
         .end(function(err, res){
-          assert.equal(res.body.stock, 'MSFT');
-          assert.equal(res.body.price, 135.28);
+          assert.equal(res.body.stock, 'TEST');
+          assert.equal(res.body.price, 100.00);
           assert.equal(res.body.likes, 1)
           done();
         });
@@ -57,13 +57,13 @@ suite('\nFunctional Tests', function() {
       test('2 stocks', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
-        .query({stock: ['msft','goog']})
+        .query({stock: ['test','other']})
         .end(function(err, res){
-          assert.equal(res.body.stock[0], 'MSFT');
-          assert.equal(res.body.stock[1], 'GOOG');
+          assert.equal(res.body.stock[0], 'TEST');
+          assert.equal(res.body.stock[1], 'OTHER');
           assert.isArray(res.body.price);
-          assert.equal(res.body.price[0], 135.28);
-          assert.equal(res.body.price[1], 1173.99);
+          assert.equal(res.body.price[0], 100.00);
+          assert.equal(res.body.price[1], 1000.00);
           assert.equal(res.body.likes[0], 1);
           assert.equal(res.body.likes[1], 0);
           done();
@@ -73,16 +73,15 @@ suite('\nFunctional Tests', function() {
       test('2 stocks with like', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
-        .query({stock: ['msft','goog'], like: true})
+        .query({stock: ['test','other'], like: true})
         .end(function(err, res){
-          assert.equal(res.body.stock[0], 'MSFT');
-          assert.equal(res.body.stock[1], 'GOOG');
+          assert.equal(res.body.stock[0], 'TEST');
+          assert.equal(res.body.stock[1], 'OTHER');
           assert.isArray(res.body.price);
-          assert.equal(res.body.price[0], 135.28);
-          assert.equal(res.body.price[1], 1173.99);
+          assert.equal(res.body.price[0], 100.00);
+          assert.equal(res.body.price[1], 1000.00);
           assert.equal(res.body.likes[0], 1);
-          assert.equal(res.body.likes[1], 1);
-          
+          assert.equal(res.body.likes[1], 0);
           done();
         });
       });
