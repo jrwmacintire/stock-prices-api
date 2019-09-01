@@ -4,69 +4,62 @@ const mongoose = require("mongoose");
 
 const Stock = require("../models/Stock.js");
 
-// const DB_URL = process.env.DB_URL;
+const DB_URL = process.env.DB_URL;
+const API_DAILY_PRICE_URL = process.env.API_DAILY_PRICE_URL;
+const API_KEY = process.env.API_KEY;
 
 function StockHandler() {
-  this.getPrice = function(name) {
-    // console.log(`stockHandler.getPrice('name' = ${name}) called!`);
-    return 100.0;
+  this.createStock = async function(name) {
+    if (name === undefined) throw Error(`No 'stockInfo' was provided!`);
+
+    const price = await this.fetchStockPrice(name);
+
+    const newStockName = name.toUpperCase(),
+          newPrice = this.fetchStockPrice(name),
+          newLikes = this.getStockLikes(name);
+
+    const newStock = new Stock({
+      stock: newStockName,
+      price: newPrice,
+      likes: newLikes
+    });
+
+    await newStock.save(function(err, doc) {
+      if(err) throw err;
+      // new stock was saved!
+    });
+
+    return newStock;
   };
 
-  this.convertRelativeLikes = function(stock1, stock2) {
-    // console.log(`this.convertRelativeLikes - stock1: `, stock1, `stock2: `, stock2);
-    return 0;
-  };
+  this.findStockInDB = async function(name) {
+    
+    try {
+      
+      const queryName = name.toUpperCase();
+      const query = await Stock.findOne({ 'stock': queryName }, function(err, docs) {
+        if(err) throw err;
+        // debugger;
+        return docs;
+      });
 
-  this.deleteAllStocks = function() {
-    console.log(`Deleting all stocks in DB`);
+      return query;
 
-    Stock.deleteMany();
-  };
-
-  this.validateStock = function(name) {
-    console.log(`this.validateStock - name: `, name);
-
-    const result = this.findStockinDB(name);
-
-    result.then(obj => console.log(`obj:`, obj));
-
-  };
-
-  this.findStockinDB = function(name) {
-    console.log(`this.findStockInDB - name: `, name);
-
-    const dbQuery = Stock.findOne({ stock: "test" });
-    const dbItem = dbQuery.then(item => item);
-
-    return dbItem;
+    } catch (err) {
+      throw err;
+    }
 
   };
 
-  this.fetchStockData = function(name) {
+  this.fetchStockPrice = async function(name) {
     console.log(`this.fetchStockData - name: `, name);
+
+    const url = `${API_DAILY_PRICE_URL}${name.toUpperCase()}&apikey=${API_KEY}`;
+    const apiData = await fetch(url).then(res => res.json()).then(json => json);
+
+    return apiData;
+
   };
-
-  // this.updateStockPrice = function(stock) {
-  //   console.log(`this.updateStockPrice - stock: `, stock);
-  // }
-
-  // this.increaseStockLikes = function(stock) {
-  //   console.log(`this.increaseStockLikes - stock: `, stock);
-  // }
-
-  // this.getStockPriceFromDB = function(stock) {
-  //   console.log(`this.getStockPriceFromDB - stock: `, stock);
-  // }
-
-  // this.getStockPriceFromAPI = function(stock) {
-  //   console.log(`this.getStockPriceFromAPI - stock: `, stock);
-  // }
-
-  // this.updateDate = function() {
-  //   const currentDateTime = new Date();
-  //   // console.log('Updating the current stock price date! | currentDateTime: ', currentDateTime);
-  //   return currentDateTime;
-  // }
 }
 
 module.exports = StockHandler;

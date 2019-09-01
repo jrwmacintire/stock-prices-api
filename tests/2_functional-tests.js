@@ -57,15 +57,15 @@ suite('\nFunctional Tests', function() {
       test('2 stocks', function(done) {
         chai.request(server)
         .get('/api/stock-prices')
-        .query({stock: ['test','other']})
+        .query({stock: ['test','other'], like: true })
         .end(function(err, res){
-          assert.equal(res.body.stock[0], 'TEST');
-          assert.equal(res.body.stock[1], 'OTHER');
-          assert.isArray(res.body.price);
-          assert.equal(res.body.price[0], 100.00);
-          assert.equal(res.body.price[1], 1000.00);
-          assert.equal(res.body.likes[0], 1);
-          assert.equal(res.body.likes[1], 0);
+          assert.equal(res.body.stock[0].stock, 'TEST');
+          assert.equal(res.body.stock[1].stock, 'OTHER');
+          assert.isArray(res.body.stock);
+          assert.equal(res.body.stock[0].price, 100.00);
+          assert.equal(res.body.stock[1].price, 1000.00);
+          assert.equal(res.body.stock[0].likes, 1);
+          assert.equal(res.body.stock[1].likes, 0);
           done();
         });
       });

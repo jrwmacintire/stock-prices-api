@@ -15,10 +15,5 @@ var stockHandler = new StockHandler();
 suite("Unit Tests", function() {
   // none required
 
-  describe('#validateStock()', () => {
-     it('should return a truthy value', function() {
-         assert.ok(stockHandler.validateStock('test'));
-     });
-  });
 
 });
