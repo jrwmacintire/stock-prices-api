@@ -1,14 +1,14 @@
 {
     "Meta Data": {
         "1. Information": "Daily Prices (open, high, low, close) and Volumes",
-        "2. Symbol": "GOOG",
+        "2. Symbol": "OTHER",
         "3. Last Refreshed": "2019-08-07",
         "4. Output Size": "Compact",
         "5. Time Zone": "US/Eastern"
     },
     "Time Series (Daily)": {
         "2019-08-07": {
-            "1. open": "1156.0000",
+            "1. open": "1000.0000",
             "2. high": "1178.3900",
             "3. low": "1149.6239",
             "4. close": "1173.9900",

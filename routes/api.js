@@ -16,9 +16,6 @@ const fetch = require("node-fetch");
 
 require("dotenv").config();
 
-// Model
-const Stock = require("../models/Stock.js");
-
 // Controller
 const StockHandler = require("../controllers/stockHandler.js");
 const stockHandler = new StockHandler();
@@ -44,32 +41,44 @@ module.exports = function(app) {
         stockType = typeof req.query.stock;
 
       let stockNames = [],
-        response = {};
+          response;
 
       if (stockType === "string") {
-        stockNames.push(queryStock);
+        stockNames.push(queryStock.toUpperCase());
 
         // Find stock in DB.
         const stock = await stockHandler.findStockInDB(stockNames[0]);
 
-        // Create a new stock, or throw an Error for invalid input.
-        if (!stock) await stockHandler.createStock(stockNames[0]);
-
         // If stock object exists, or is created, then build response.
         if (stock) {
+
+          // Update stock with an appropriate 'like' and if the price
+          // needs to be adjusted to be current (in progress).
+          const updatedStock = stockHandler.updateStock(stock);
+
           response = {
-            stock: stockNames[0].toUpperCase(),
-            price: stock.price,
-            likes: stock.likes
+            stockData: {
+              stock: stockNames[0],
+              price: stock.price,
+              likes: stock.likes
+            }
           };
 
           res.send(response);
 
         } else {
-          throw Error(`Invalid 'stock' input`);
+
+          // Create a new stock, or throw an Error for invalid input.
+          try {
+            const newStock = await stockHandler.createStock(stockNames[0]);
+            res.send(response);
+          } catch(err) {
+            throw Error(`Invalid 'stock' input`);
+          }
+
         }
       } else if (Array.isArray(queryStock)) {
-        stockNames = [...queryStock];
+        stockNames = [...queryStock].map(name => name.toUpperCase());
 
         // Find stocks in DB using handler and Mongoose.findOne().
         let stock1 = await stockHandler.findStockInDB(stockNames[0]);
@@ -80,31 +89,33 @@ module.exports = function(app) {
         // new likes, IP addresses, and 'price_updated'
         // doc properties to reflect newest request.
 
-
-        // If a stock input is missing in the DB,
-        // search the API data and create new Mongoose/DB
-        // docs for the new stock objects.
-        if (!stock1) stock1 = await stockHandler.createStock(stockNames[0])
-        if (!stock2) stock2 = await stockHandler.createStock(stockNames[1]);
-
         if (stock1 && stock2) {
           // Respond with array of stock objects
-          response.stockData.push(
-            {
-              stock: stockNames[0].toUpperCase(),
-              price: stock1.price,
-              likes: stock1.likes
-            },
-            {
-              stock: stockNames[1].toUpperCase(),
-              price: stock2.price,
-              likes: stock2.likes
-            }
-          );
+          response = { 
+            stockData: [{
+                stock: stockNames[0].toUpperCase(),
+                price: stock1.price,
+                likes: stock1.likes
+              },
+              {
+                stock: stockNames[1].toUpperCase(),
+                price: stock2.price,
+                likes: stock2.likes
+              }
+            ]
+          };
 
           res.send(response);
+
         } else {
-          throw Error("Please make sure both inputs are valid.");
+
+          // If a stock input is missing in the DB,
+          // search the API data and create new Mongoose/DB
+          // docs for the new stock objects.
+          if (!stock1) stock1 = await stockHandler.createStock(stockNames[0])
+          if (!stock2) stock2 = await stockHandler.createStock(stockNames[1]);
+          else throw Error("Please make sure both inputs are valid.");
+
         }
       } else {
         throw Error("Query from request is not a string or Array.");

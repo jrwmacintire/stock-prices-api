@@ -23,9 +23,9 @@ suite('\nFunctional Tests', function() {
         .query({stock: 'test'})
         .end(function(err, res){
           // console.log(`response from GET 'api/stock-prices': `, res.body);
-          assert.equal(res.body.stock, 'TEST');
-          assert.equal(res.body.price, 100.00);
-          assert.equal(res.body.likes, 0);
+          assert.equal(res.body.stockData.stock, 'TEST');
+          assert.equal(res.body.stockData.price, 100.00);
+          assert.equal(res.body.stockData.likes, 0);
           done();
         });
       });
@@ -35,9 +35,9 @@ suite('\nFunctional Tests', function() {
         .get('/api/stock-prices')
         .query({stock: 'test', like: true})
         .end(function(err, res){
-          assert.equal(res.body.stock, 'TEST');
-          assert.equal(res.body.price, 100.00);
-          assert.equal(res.body.likes, 1);
+          assert.equal(res.body.stockData.stock, 'TEST');
+          assert.equal(res.body.stockData.price, 100.00);
+          assert.equal(res.body.stockData.likes, 1);
           done();
         });
       });
@@ -47,9 +47,9 @@ suite('\nFunctional Tests', function() {
         .get('/api/stock-prices')
         .query({stock: 'test', like: true})
         .end(function(err, res){
-          assert.equal(res.body.stock, 'TEST');
-          assert.equal(res.body.price, 100.00);
-          assert.equal(res.body.likes, 1)
+          assert.equal(res.body.stockData.stock, 'TEST');
+          assert.equal(res.body.stockData.price, 100.0000);
+          assert.equal(res.body.stockData.likes, 1)
           done();
         });
       });
@@ -62,8 +62,8 @@ suite('\nFunctional Tests', function() {
           assert.equal(res.body.stock[0].stock, 'TEST');
           assert.equal(res.body.stock[1].stock, 'OTHER');
           assert.isArray(res.body.stock);
-          assert.equal(res.body.stock[0].price, 100.00);
-          assert.equal(res.body.stock[1].price, 1000.00);
+          assert.equal(res.body.stock[0].price, 100.0000);
+          assert.equal(res.body.stock[1].price, 1000.0000);
           assert.equal(res.body.stock[0].likes, 1);
           assert.equal(res.body.stock[1].likes, 0);
           done();
@@ -78,8 +78,8 @@ suite('\nFunctional Tests', function() {
           assert.equal(res.body.stock[0], 'TEST');
           assert.equal(res.body.stock[1], 'OTHER');
           assert.isArray(res.body.price);
-          assert.equal(res.body.price[0], 100.00);
-          assert.equal(res.body.price[1], 1000.00);
+          assert.equal(res.body.price[0], 100.0000);
+          assert.equal(res.body.price[1], 1000.0000);
           assert.equal(res.body.likes[0], 1);
           assert.equal(res.body.likes[1], 0);
           done();
