@@ -11,7 +11,6 @@
 const expect = require("chai").expect;
 const MongoClient = require("mongodb");
 const mongoose = require("mongoose");
-const os = require("os");
 const fetch = require("node-fetch");
 
 require("dotenv").config();
@@ -37,7 +36,6 @@ module.exports = function(app) {
 
       const queryStock = req.query.stock,
         queryLike = req.query.like,
-        ipAddress = req.hostname,
         stockType = typeof req.query.stock;
 
       let stockNames = [],
@@ -46,43 +44,53 @@ module.exports = function(app) {
       if (stockType === "string") {
         stockNames.push(queryStock.toUpperCase());
 
-        // Find stock in DB.
-        const stock = await stockHandler.findStockInDB(stockNames[0]);
-
-        // If stock object exists, or is created, then build response.
-        if (stock) {
-
           // Update stock with an appropriate 'like' and if the price
           // needs to be adjusted to be current (in progress).
-          const updatedStock = stockHandler.updateStock(stock);
 
-          response = {
-            stockData: {
-              stock: stockNames[0],
-              price: stock.price,
-              likes: stock.likes
-            }
-          };
-
-          res.send(response);
-
-        } else {
-
-          // Create a new stock, or throw an Error for invalid input.
           try {
-            const newStock = await stockHandler.createStock(stockNames[0]);
-            res.send(response);
+
+            // Find stock in DB.
+            const stock = await stockHandler.findStockInDB(stockNames[0]);
+
+            if(stock) {
+
+              await stockHandler.updateStock(stock, queryLike);
+
+              response = {
+                stockData: {
+                  stock: stock.stock,
+                  price: stock.price,
+                  likes: stock.likes
+                }
+              };
+
+              res.send(response);
+
+            } else {
+
+              const newStock = await stockHandler.createStock(stockNames[0], queryLike);
+
+              response = {
+                stock: newStock.stock,
+                price: newStock.price,
+                likes: newStock.likes
+              }
+
+              res.send(response);
+
+            }
+
           } catch(err) {
-            throw Error(`Invalid 'stock' input`);
+            throw err;
+            // throw Error('Failed to update existing stock!');
           }
 
-        }
       } else if (Array.isArray(queryStock)) {
         stockNames = [...queryStock].map(name => name.toUpperCase());
 
         // Find stocks in DB using handler and Mongoose.findOne().
-        let stock1 = await stockHandler.findStockInDB(stockNames[0]);
-        let stock2 = await stockHandler.findStockInDB(stockNames[1]);
+        const stock1 = await stockHandler.findStockInDB(stockNames[0]);
+        const stock2 = await stockHandler.findStockInDB(stockNames[1]);
 
         // Before creating any new DB update the
         // existing stocks returned and add any
@@ -91,6 +99,9 @@ module.exports = function(app) {
 
         if (stock1 && stock2) {
           // Respond with array of stock objects
+
+          // Update both stocks
+
           response = { 
             stockData: [{
                 stock: stockNames[0].toUpperCase(),
@@ -109,12 +120,38 @@ module.exports = function(app) {
 
         } else {
 
-          // If a stock input is missing in the DB,
-          // search the API data and create new Mongoose/DB
-          // docs for the new stock objects.
-          if (!stock1) stock1 = await stockHandler.createStock(stockNames[0])
-          if (!stock2) stock2 = await stockHandler.createStock(stockNames[1]);
-          else throw Error("Please make sure both inputs are valid.");
+          try {
+            
+            // If a stock input is missing in the DB,
+            // search the API data and create new Mongoose/DB
+            // docs for the new stock objects.
+            if (!stock1) newStock1 = await stockHandler.createStock(stockNames[0])
+            if (!stock2) newStock2 = await stockHandler.createStock(stockNames[1]);
+
+            response = { 
+              stockData: [{
+                  stock: newStock1.stock,
+                  price: newStock1.price,
+                  likes: newStock1.likes
+                },
+                {
+                  stock: newStock2.stock,
+                  price: newStock2.price,
+                  likes: newStock2.likes
+                }
+              ]
+            };
+
+            res.send(response);
+
+          } catch(err) {
+            throw Error("Please make sure both inputs are valid.", err);
+          }
+
+          /* TODO: Send response with appropriate formatting for each stock
+          
+          */
+
 
         }
       } else {

@@ -1,20 +1,24 @@
 "use strict";
 
-var express = require("express");
-var bodyParser = require("body-parser");
-var expect = require("chai").expect;
-var cors = require("cors");
+const express = require("express");
+const bodyParser = require("body-parser");
+const expect = require("chai").expect;
+const cors = require("cors");
 const path = require('path');
 const process = require('process');
 const dotenv = require('dotenv');
 
-var apiRoutes = require("./routes/api.js");
-var fccTestingRoutes = require("./routes/fcctesting.js");
-var runner = require("./test-runner");
+const apiRoutes = require("./routes/api.js");
+const fccTestingRoutes = require("./routes/fcctesting.js");
+const runner = require("./test-runner");
+const cleanDatabaseForTests = require('./lib/cleanDatabaseForTests.js');
 
-if(process.env.NODE_ENV !== 'production') {
-  console.log(`Environment is not production!`);
+if(process.env.NODE_ENV === 'test') {
+  console.log(`Environment is set to 'test'!`);
   dotenv.config();
+
+  // Clean database of old test docs.
+  cleanDatabaseForTests();
 }
 
 const PORT = process.env.PORT;
@@ -62,7 +66,7 @@ app.listen(PORT || 3000, function() {
         console.log("Tests are not valid:");
         console.log(error);
       }
-    }, 2400);
+    }, 3400);
   }
 });
 

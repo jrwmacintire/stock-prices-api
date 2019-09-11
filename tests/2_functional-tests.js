@@ -20,7 +20,7 @@ suite('\nFunctional Tests', function() {
       test('1 stock', function(done) {
        chai.request(server)
         .get('/api/stock-prices')
-        .query({stock: 'test'})
+        .query({stock: 'test', like: true })
         .end(function(err, res){
           // console.log(`response from GET 'api/stock-prices': `, res.body);
           assert.equal(res.body.stockData.stock, 'TEST');
