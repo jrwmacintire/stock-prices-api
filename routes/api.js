@@ -1,81 +1,166 @@
 /*
-*
-*
-*       Complete the API routing below
-*
-*
-*/
+ *
+ *
+ *       Complete the API routing below
+ *
+ *
+ */
 
-'use strict';
+"use strict";
 
-const expect = require('chai').expect,
-      MongoClient = require('mongodb'),
-      mongoose = require('mongoose'),
-      os = require('os'),
-      networkInterfaces = os.networkInterfaces();
+const expect = require("chai").expect;
+const MongoClient = require("mongodb");
+const mongoose = require("mongoose");
+const fetch = require("node-fetch");
 
-// Model
-const Stock = require('../models/Stock.js');
+require("dotenv").config();
 
 // Controller
-const StockHandler = require('../controllers/stockHandler.js');
+const StockHandler = require("../controllers/stockHandler.js");
 const stockHandler = new StockHandler();
 
-const validateStock = require('../lib/validateStock.js');
-
 const DB_URL = process.env.DB_URL;
+const NODE_ENV = process.env.NODE_ENV;
 
-module.exports = function (app) {
+module.exports = function(app) {
+  app.route("/api/stock-prices").get(async function(req, res) {
+    mongoose.connect(DB_URL, { useNewUrlParser: true });
+    const db = mongoose.connection;
 
-  app.route('/api/stock-prices')
-    .get(function (req, res){
-      // console.log(`req.query: `, req.query);
-      // res.send(req.query);
+    db.on(
+      "error",
+      console.error.bind(console, "MongoDB/Mongoose connection error")
+    );
 
-      const ipAddress = networkInterfaces.lo[0].address;  
-      console.log(`IP address: ${ipAddress}`);
-    
-      const stockName = req.query.stock || req.query.stock[0];
-  
-      // console.log(`Stock :`, stock);      
-  
-      mongoose.connect(DB_URL, { useNewUrlParser: true });
-  
-      const db = mongoose.connection;
-  
-      // On database connection error
-      db.on('error', console.error.bind(console, 'Connection error:'));
-  
-      // Received 'open' event from database.
-      db.on('open', () => {
-        console.log('Inside the open database connection.');
-        // res.send(stock);
-        // console.log(`stockHandler.updateDate: ${stockHandler.updateDate()}`);
-        const stock = new Stock({
-          stock: stockName.toUpperCase(),
-          price: "135.28",
-          likes: 1,
-          price_updated: { type: Date, default: new Date },
-          ipAddresses: [ipAddress]
-        });
-        
-        stock.save((err, stock) => {
-          if(err) throw err;
-          res.send(stock);
-        });
-        
-      });
-  
-      db.on('close', () => {
-        console.log('Disconnected from the DB!');
-      });
-    
+    db.once("open", async function() {
+      // console.log("Connected to DB!");
+
+      const queryStock = req.query.stock,
+        queryLike = req.query.like,
+        stockType = typeof req.query.stock,
+        ipAddress = req.hostname,
+        stockLike = queryLike === "true" ? true : false;
+
+      let stockNames = [],
+        response;
+
+      if (stockType === "string") {
+        stockNames.push(queryStock.toUpperCase());
+
+        // Update stock with an appropriate 'like' and if the price
+        // needs to be adjusted to be current (in progress).
+
+        try {
+          const stockName = stockNames[0];
+          // Find stock in DB.
+          // if(stockLike === true) console.log(`'stock' was liked!`);
+          let stock = await stockHandler.findStockInDB(
+            stockName,
+            stockLike
+          );
+          const ipAddresses = [...stock.ipAddresses];
+
+          const outOfDatePrice = stockHandler.isPriceOutdated(
+            stock.price_updated
+          );
+
+          if (outOfDatePrice && !stock.isNew) {
+            stock = await stockHandler.updateStock(
+              stockName,
+              stockLike,
+              ipAddress
+            );
+          }
+
+          response = {
+            stockData: {
+              stock: stock.stock,
+              price: String(stock.price),
+              likes: stock.likes
+            }
+          };
+
+        } catch (err) {
+          // console.log(`err.message: ${err.message}`);
+          throw err;
+        } finally {
+          // Return requested 'stockData' object as 'response'
+          res.json(response);
+        }
+      } else if (Array.isArray(queryStock)) {
+        stockNames = [...queryStock].map(name => name.toUpperCase());
+
+        const stockName1 = stockNames[0],
+              stockName2 = stockNames[1];
+
+        let response;
+
+        try {
+
+          // Find stocks in DB using handler and Mongoose.findOne().
+          let stock1 = await stockHandler.findStockInDB(
+            stockName1,
+            stockLike,
+            ipAddress
+          );
+          let stock2 = await stockHandler.findStockInDB(
+            stockName2,
+            stockLike,
+            ipAddress
+          );
+
+          const stock1IPAddresses = [...stock1.ipAddresses],
+                stock2IPAddresses = [...stock2.ipAddresses],
+                stock1OutOfDate = stockHandler.isPriceOutdated(
+                  stock1.price_updated
+                ),
+                stock2OutOfDate = stockHandler.isPriceOutdated(
+                  stock2.price_updated
+                );
+
+          // Update out of date stocks here.
+          let updatedStock1, updatedStock2;
+
+          if(stock1OutOfDate && !stock1.isNew) stock1 = await stockHandler.updateStock(stockName1, stockLike, ipAddress);
+          if(stock2OutOfDate && !stock2.isNew) stock2 = await stockHandler.updateStock(stockName2, stockLike, ipAddress);
+
+          const relativeLikes = stockHandler.getRelativeLikes(stock1.likes, stock2.likes);
+
+          const stock1Data = {
+                stock: stock1.stock,
+                price: stock1.price,
+                rel_likes: relativeLikes[0]
+              },
+              stock2Data = {
+                stock: stock2.stock,
+                price: stock2.price,
+                rel_likes: relativeLikes[1]
+              };
+
+          response = {
+            stockData: [
+              stock1Data,
+              stock2Data
+            ]
+          };
+
+        } catch (err) {
+
+          throw err
+
+        } finally {
+
+          res.json(response);
+
+        }
+
+        // Before creating any new DB update the
+        // existing stocks returned and add any
+        // new likes, IP addresses, and 'price_updated'
+        // doc properties to reflect newest request.
+      } else {
+        throw Error("Query from request is not a string or Array.");
+      }
     });
-    
-    // const validStock = validateStock(stockName).then(res => { return res });
-
-    //   console.log(`is stock valid?: ${validStock}`);
-  
-    // });
-    
+  });
 };
