@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const Stock = require("../models/Stock.js");
 
 const NODE_ENV = process.env.NODE_ENV;
+const DATA_TYPE = process.env.DATA_TYPE;
 const DB_URL = process.env.DB_URL;
 const API_DAILY_PRICE_URL = process.env.API_DAILY_PRICE_URL;
 const API_KEY = process.env.API_KEY;
@@ -42,6 +43,8 @@ function StockHandler() {
         likes: newLikes,
         ipAddresses: [ipAddress]
       };
+
+      let data;
 
       if(like) {
         data = dataWithIpAddress;
@@ -128,37 +131,34 @@ function StockHandler() {
     try {
       let newPrice;
 
-      if (NODE_ENV === "test") {
-        const dataTest = testDaily,
-              dataOther = otherDaily;
+      const dataTest = testDaily,
+            dataOther = otherDaily;
+      // console.log(`data: `, data);
+      // console.log(`Time Series (Daily) Info from API:`, data['Time Series (Daily)']);
 
-        // console.log(`data: `, data);
-        // console.log(`Time Series (Daily) Info from API:`, data['Time Series (Daily)']);
-
-        if(name === 'TEST') {
-          newPrice = Number(
-            dataTest["Time Series (Daily)"]["2019-08-07"]["1. open"]
-          );
-          // console.log(`newPrice: `, newPrice);
-          return newPrice;
-        } else if(name === 'OTHER') {
-          newPrice = Number(
-            dataOther["Time Series (Daily)"]["2019-08-07"]["1. open"]
-          );
-          // console.log(`newPrice: `, newPrice);
-          return newPrice;
-          
-        } else {
-          throw Error('Error using preloaded data.')
-        }
-
+      if(name === 'TEST') {
+        newPrice = Number(
+          dataTest["Time Series (Daily)"]["2019-08-07"]["1. open"]
+        );
+        // console.log(`newPrice: `, newPrice);
+        return newPrice;
+      } else if(name === 'OTHER') {
+        newPrice = Number(
+          dataOther["Time Series (Daily)"]["2019-08-07"]["1. open"]
+        );
+        // console.log(`newPrice: `, newPrice);
+        return newPrice;
+        
       } else {
         const url = `${API_DAILY_PRICE_URL}${name}&apikey=${API_KEY}`;
         const apiJson = await fetch(url)
           .then(res => res.json());
 
-        newPrice = Number(apiJson["Time Series (Daily)"]["2019-08-07"]["1. open"]);
-        return newPrice;
+          const date = new Date,
+                today = date.toISOString().substring(0,10);
+    
+          newPrice = Number(apiJson["Time Series (Daily)"][today]["1. open"]);
+          return newPrice;
       }
     } catch (err) {
       throw err;

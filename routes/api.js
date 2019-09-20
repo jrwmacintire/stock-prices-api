@@ -85,7 +85,7 @@ module.exports = function(app) {
           throw err;
         } finally {
           // Return requested 'stockData' object as 'response'
-          res.send(response);
+          res.json(response);
         }
       } else if (Array.isArray(queryStock)) {
         stockNames = [...queryStock].map(name => name.toUpperCase());
@@ -150,7 +150,7 @@ module.exports = function(app) {
 
         } finally {
 
-          res.send(response);
+          res.json(response);
 
         }
 
