@@ -207,6 +207,14 @@ function StockHandler() {
 
     return valid;
   };
+
+  this.getRelativeLikes = function(likes1, likes2) {
+    if(likes1 >= likes2) {
+      return [likes1 - likes2, likes2 - likes1];
+    } else {
+      return [likes2 - likes1, likes1 - likes2];
+    }
+  }
 }
 
 module.exports = StockHandler;

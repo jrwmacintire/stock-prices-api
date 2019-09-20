@@ -78,8 +78,8 @@ suite("\nFunctional Tests", function() {
           assert.isArray(res.body.stockData);
           assert.equal(res.body.stockData[0].price, 100.0);
           assert.equal(res.body.stockData[1].price, 1000.0);
-          assert.equal(res.body.stockData[0].likes, 1);
-          assert.equal(res.body.stockData[1].likes, 0);
+          assert.equal(res.body.stockData[0].rel_likes, 1);
+          assert.equal(res.body.stockData[1].rel_likes, -1);
           done();
         });
     });
@@ -95,8 +95,8 @@ suite("\nFunctional Tests", function() {
           assert.isArray(res.body.stockData);
           assert.equal(res.body.stockData[0].price, 100.0);
           assert.equal(res.body.stockData[1].price, 1000.0);
-          assert.equal(res.body.stockData[0].likes, 1);
-          assert.equal(res.body.stockData[1].likes, 1);
+          assert.equal(res.body.stockData[0].rel_likes, 0);
+          assert.equal(res.body.stockData[1].rel_likes, 0);
           done();
         });
     });

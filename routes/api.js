@@ -104,16 +104,17 @@ module.exports = function(app) {
         const stockName1 = stockNames[0],
               stockName2 = stockNames[1];
 
-        let stock1, stock2;
+        let response;
 
         try {
+
           // Find stocks in DB using handler and Mongoose.findOne().
-          stock1 = await stockHandler.findStockInDB(
+          let stock1 = await stockHandler.findStockInDB(
             stockName1,
             stockLike,
             ipAddress
           );
-          stock2 = await stockHandler.findStockInDB(
+          let stock2 = await stockHandler.findStockInDB(
             stockName2,
             stockLike,
             ipAddress
@@ -128,22 +129,24 @@ module.exports = function(app) {
                   stock2.price_updated
                 );
 
+          // Update out of date stocks here.
           let updatedStock1, updatedStock2;
 
-          if(stock1OutOfDate && !stock1.isNew) updatedStock1 = await stockHandler.updateStock(stockName1, stockLike, ipAddress);
-          if(stock2OutOfDate && !stock2.isNew) updatedStock2 = await stockHandler.updateStock(stockName2, stockLike, ipAddress);
+          if(stock1OutOfDate && !stock1.isNew) stock1 = await stockHandler.updateStock(stockName1, stockLike, ipAddress);
+          if(stock2OutOfDate && !stock2.isNew) stock2 = await stockHandler.updateStock(stockName2, stockLike, ipAddress);
 
-          let stock1Data = {
-            stock: updatedStock1.stock,
-            price: updatedStock1.price,
-            likes: updatedStock1.likes
-          };
+          const relativeLikes = stockHandler.getRelativeLikes(stock1.likes, stock2.likes);
 
-          let stock2Data = {
-            stock: updatedStock2.stock,
-            price: updatedStock2.price,
-            likes: updatedStock2.likes
-          };
+          const stock1Data = {
+                stock: stock1.stock,
+                price: stock1.price,
+                rel_likes: relativeLikes[0]
+              },
+              stock2Data = {
+                stock: stock2.stock,
+                price: stock2.price,
+                rel_likes: relativeLikes[1]
+              };
 
           response = {
             stockData: [
@@ -159,7 +162,7 @@ module.exports = function(app) {
         } finally {
 
           res.send(response);
-          
+
         }
 
         // Before creating any new DB update the
