@@ -14,26 +14,42 @@ const ipAddress = os.networkInterfaces().ipAddress;
 
 // Temp JSON data to avoid API calls
 const testDaily = require("../data/test_daily_price_sample.json");
+const otherDaily = require("../data/other_daily_price_sample.json");
 
 function StockHandler() {
-  this.createStock = async function(name) {
 
+  this.createStock = async function(name, like, ipAddress) {
     try {
-
       if (name === undefined) throw Error(`No 'name' was provided!`);
 
       const newStockName = name.toUpperCase(),
-        newPrice = await this.fetchStockPrice(name);
+        newPrice = await this.fetchStockPrice(name),
+        newLikes = like === true ? 1 : 0;
 
       if (typeof newPrice !== "number") {
         throw Error(`Failed to fetch price of new 'stock'!`);
       }
 
-      const newStock = new Stock({
+      const dataNoIpAddress = {
         stock: newStockName,
         price: newPrice,
-        likes: 0
-      });
+        likes: newLikes
+      };
+
+      const dataWithIpAddress = {
+        stock: newStockName,
+        price: newPrice,
+        likes: newLikes,
+        ipAddresses: [ipAddress]
+      };
+
+      if(like) {
+        data = dataWithIpAddress;
+      } else {
+        data = dataNoIpAddress;
+      }
+
+      const newStock = new Stock(data);
 
       await newStock.save(function(doc) {
         // new stock was saved!
@@ -42,90 +58,154 @@ function StockHandler() {
 
       return newStock;
 
-    } catch(err) {
-      // console.error(err);
-      throw err;
-    }
-  };
-
-  this.updateStock = async function(stock, stockLike) {
-
-    try {
-
-      const stockName = (stock.stock).toUpperCase();
-      const newStockPrice = await this.fetchStockPrice(stockName);      
-      await stock.updateOne({ price: newStockPrice });
-
     } catch (err) {
       throw err;
-      // throw Error("Failed to update stock!");
     }
   };
 
-  this.findStockInDB = async function(name) {
+  this.updateStock = async function(name, like, ipAddress) {
+
+    // const name = stock.stock,
+    //       likes = stock.likes,
+    //       ipAddresses = [...stock.ipAddresses];
 
     try {
-      
-      const query = await Stock.findOne({ stock: name }, function(err, doc) {
-        if (err) throw err;
-        if(!doc) console.log(`DOC NOT FOUND IN DB!`);
-        // debugger;
+
+      const query = { stock: name };
+      const stock = await Stock.findOne(query);
+
+      const newPrice = await this.fetchStockPrice(name),
+            likes = stock.likes,
+            ipAddresses = [...stock.ipAddresses],
+            today = new Date();
+
+      const usedIpAddress = ipAddresses.indexOf(ipAddress);
+
+      if(usedIpAddress === -1 && like) {
+        const newIpAddresses = [...stock.ipAddresses, ipAddress];
+        stock.likes = likes + 1;
+        stock.ipAddresses = newIpAddresses;
+      }
+
+      stock.price = newPrice;
+      stock.price_updated = today.now;
+      stock.save();
+
+      return await stock;
+
+    } catch (err) { throw err }
+
+  };
+
+  this.findStockInDB = async function(name, like) {
+    try {
+      const query = await Stock.findOne({ stock: name }, async function(doc) {
+        if (!doc) {
+          // console.log(`DOC NOT FOUND IN DB!`);
+          // throw Error('stock not found');
+        }
+
         return doc;
       });
 
-      return query;
-
+      if (query === null) {
+        // console.log(`'stock' not found! Create a new 'stock' now?`);
+        const newStock = await this.createStock(name, like);
+        return newStock;
+      } else {
+        return query;
+      }
     } catch (err) {
       throw err;
     }
-
   };
 
   this.getStockLikes = function() {};
 
   this.fetchStockPrice = async function(name) {
-    console.log(`this.fetchStockData - name: `, name);
+    // console.log(`this.fetchStockData - name: `, name);
 
     try {
-
       let newPrice;
 
       if (NODE_ENV === "test") {
-        const data = testDaily;
+        const dataTest = testDaily,
+              dataOther = otherDaily;
 
         // console.log(`data: `, data);
         // console.log(`Time Series (Daily) Info from API:`, data['Time Series (Daily)']);
 
-        const newPrice = Number(data['Time Series (Daily)']['2019-08-07']['1. open']);
-        // console.log(`newPrice: `, newPrice);
-        return newPrice;
+        if(name === 'TEST') {
+          newPrice = Number(
+            dataTest["Time Series (Daily)"]["2019-08-07"]["1. open"]
+          );
+          // console.log(`newPrice: `, newPrice);
+          return newPrice;
+        } else if(name === 'OTHER') {
+          newPrice = Number(
+            dataOther["Time Series (Daily)"]["2019-08-07"]["1. open"]
+          );
+          // console.log(`newPrice: `, newPrice);
+          return newPrice;
+          
+        } else {
+          throw Error('Error using preloaded data.')
+        }
 
       } else {
         const url = `${API_DAILY_PRICE_URL}${name}&apikey=${API_KEY}`;
         const apiJson = await fetch(url)
-          .then(res => res.json())
-          .then(json => json.toObject());
+          .then(res => res.json());
 
-        newPrice = 0;
+        newPrice = Number(apiJson["Time Series (Daily)"]["2019-08-07"]["1. open"]);
+        return newPrice;
       }
-
-    } catch(err) {
+    } catch (err) {
       throw err;
     }
-
   };
 
   this.removeStockFromDB = async function(name) {
     // Find the 'TEST' and 'OTHER' docs and delete them before tests are run.
 
     try {
-
-      await Stock.deleteOne({ stock: name }, doc => console.log(`Deleted doc! `, doc) );
-
-    } catch(err) {
-      throw Error('Failed to remove stock from DB!');
+      await Stock.deleteOne({ stock: name }, doc =>
+        console.log(`Deleted doc! `, doc)
+      );
+    } catch (err) {
+      throw Error("Failed to remove stock from DB!");
     }
+  };
 
+  this.isPriceOutdated = function(updateDate) {
+    // console.log(`'stock's date: ${lastUpdated}`);
+    const date = new Date();
+    const last = updateDate.toISOString().substring(0,10),
+          today = date.toISOString().substring(0, 10);
+
+    const dateRegex = /^(\d{4})-(\d{2})-(\d{2})$/;
+    const lastMatches = last.match(dateRegex);
+    const todayMatches = today.match(dateRegex);
+    const testMatches = "2019-05-10".match(dateRegex);
+
+    /*
+    TODO: Compare each index (after 0) of 'todayMatches'
+    if a 'today' value is newer than a 'lastUpdated' value
+    then return that the price is outdated and needs updating.
+    */
+
+    let valid = false;
+
+    todayMatches.forEach((match, index) => {
+      if (index === 0) return;
+      const curr = Number(match);
+      let last;
+      if(NODE_ENV === 'test') last = Number(testMatches[index]);
+      else if(NODE_ENV !== 'test') last = Number(lastMatches[index]);
+      if (curr > last) valid = true;
+    });
+
+    return valid;
   };
 }
 

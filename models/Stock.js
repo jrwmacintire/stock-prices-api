@@ -5,7 +5,7 @@ const stockSchema = new Schema(
   {
     stock: String,
     price: Number,
-    likes: Number,
+    likes: { type: Number, default: 0 },
     price_updated: { type: Date, default: Date.now },
     ipAddresses: { type: [String], default: [] }
   }

@@ -11,14 +11,10 @@ const dotenv = require('dotenv');
 const apiRoutes = require("./routes/api.js");
 const fccTestingRoutes = require("./routes/fcctesting.js");
 const runner = require("./test-runner");
-const cleanDatabaseForTests = require('./lib/cleanDatabaseForTests.js');
 
 if(process.env.NODE_ENV === 'test') {
   console.log(`Environment is set to 'test'!`);
   dotenv.config();
-
-  // Clean database of old test docs.
-  cleanDatabaseForTests();
 }
 
 const PORT = process.env.PORT;
