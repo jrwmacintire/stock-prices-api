@@ -88,7 +88,7 @@ function StockHandler() {
       }
 
       stock.price = newPrice;
-      stock.price_updated = today.now;
+      stock.price_updated = today;
       stock.save();
 
       return await stock;

@@ -54,43 +54,32 @@ module.exports = function(app) {
           const stockName = stockNames[0];
           // Find stock in DB.
           // if(stockLike === true) console.log(`'stock' was liked!`);
-          let existingStock = await stockHandler.findStockInDB(
+          let stock = await stockHandler.findStockInDB(
             stockName,
             stockLike
           );
-          const ipAddresses = [...existingStock.ipAddresses];
+          const ipAddresses = [...stock.ipAddresses];
 
           const outOfDatePrice = stockHandler.isPriceOutdated(
-            existingStock.price_updated
+            stock.price_updated
           );
 
-          /* 
-            TODO: Remove default 'true' value to test function
-            of 'stockHandler' controller.
-            */
-
-          if (outOfDatePrice && !existingStock.isNew) {
-            let updatedStock = await stockHandler.updateStock(
+          if (outOfDatePrice && !stock.isNew) {
+            stock = await stockHandler.updateStock(
               stockName,
               stockLike,
               ipAddress
             );
-            response = {
-              stockData: {
-                stock: updatedStock.stock,
-                price: updatedStock.price,
-                likes: updatedStock.likes
-              }
-            };
-          } else {
-            response = {
-              stockData: {
-                stock: existingStock.stock,
-                price: existingStock.price,
-                likes: existingStock.likes
-              }
-            };
           }
+
+          response = {
+            stockData: {
+              stock: stock.stock,
+              price: String(stock.price),
+              likes: stock.likes
+            }
+          };
+
         } catch (err) {
           // console.log(`err.message: ${err.message}`);
           throw err;
