@@ -1,0 +1,16 @@
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px; }
+  body div.container {
+    margin: 5rem auto; }
+    body div.container h1 {
+      font-size: 2.4rem; }
+    body div.container span#websiteLink {
+      color: #ee90c4; }
+    body div.container div.row > div {
+      margin: auto; }
+    @media (min-width: 768px) {
+      body div.container div.row {
+        margin: 0; } }
+
+/*# sourceMappingURL=style.css.map */

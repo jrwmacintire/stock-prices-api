@@ -28,7 +28,9 @@ function StockHandler() {
         newLikes = like === true ? 1 : 0;
 
       if (typeof newPrice !== "number") {
-        throw Error(`Failed to fetch price of new 'stock'!`);
+        throw Error(`Failed to fetch price of new 'stock'! Please try again.`);
+      } else if(typeof newPrice === undefined) {
+
       }
 
       const dataNoIpAddress = {
@@ -63,6 +65,7 @@ function StockHandler() {
 
     } catch (err) {
       throw err;
+      // throw Error('Error creating stock!');
     }
   };
 
@@ -161,7 +164,8 @@ function StockHandler() {
           return newPrice;
       }
     } catch (err) {
-      throw err;
+      // throw Error(`Error finding info for that stock!`);
+      return 'No info found for that stock! Please try again.';
     }
   };
 

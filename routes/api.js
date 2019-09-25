@@ -81,10 +81,13 @@ module.exports = function(app) {
           };
 
         } catch (err) {
-          // console.log(`err.message: ${err.message}`);
-          throw err;
+          
+          // throw err;
+          response = 'Error finding stock info! Please try again!';
+
         } finally {
           // Return requested 'stockData' object as 'response'
+          console.log(`response: `, response);
           res.json(response);
         }
       } else if (Array.isArray(queryStock)) {
@@ -150,6 +153,7 @@ module.exports = function(app) {
 
         } finally {
 
+          console.log(`response: `, response);
           res.json(response);
 
         }

@@ -1,0 +1,34 @@
+// @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
+body {
+    // color: red;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+
+    div.container {
+
+        h1 {
+            font-size: 2.4rem;
+        }
+
+        margin: 5rem auto;
+
+        // section#header {
+        //     background-color: lightgray;
+        // }
+
+        span#websiteLink {
+            color: rgb(238, 144, 196);
+        }
+
+        div.row > div {
+            margin: auto;
+        }
+
+        @media (min-width: 768px) {
+            div.row {
+                margin: 0;
+            }
+        }
+    }
+}

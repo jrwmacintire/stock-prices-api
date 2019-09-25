@@ -4,16 +4,16 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const expect = require("chai").expect;
 const cors = require("cors");
-const path = require('path');
-const process = require('process');
-const dotenv = require('dotenv');
-const helmet = require('helmet');
+const path = require("path");
+const process = require("process");
+const dotenv = require("dotenv");
+const helmet = require("helmet");
 
 const apiRoutes = require("./routes/api.js");
 const fccTestingRoutes = require("./routes/fcctesting.js");
 const runner = require("./test-runner");
 
-if(process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV === "test") {
   console.log(`Environment is set to 'test'!`);
   dotenv.config();
 }
@@ -24,13 +24,23 @@ const NODE_ENV = process.env.NODE_ENV;
 const app = express();
 
 app.use(helmet());
-app.use(helmet.contentSecurityPolicy({
-  directives: {
-    defaultSrc: ["'self'"],
-    styleSrc: ["'self'"],
-    scriptSrc: ["'self'"]
-  }
-}));
+app.use(
+  helmet({
+    csp: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: [
+          "'self'",
+          "https://fonts.googleapis.com"
+        ],
+        scriptSrc: [
+          "'self'",
+          "https://code.jquery.com"
+        ]
+      }
+    }
+  })
+);
 
 app.use("/public", express.static(path.join(__dirname, "public")));
 
