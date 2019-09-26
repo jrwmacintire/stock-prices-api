@@ -33,7 +33,7 @@ module.exports = function(app) {
     );
 
     db.once("open", async function() {
-      console.log("Connected to DB!");
+      // console.log("Connected to DB!");
 
       const queryStock = req.query.stock,
         queryLike = req.query.like,
@@ -87,7 +87,7 @@ module.exports = function(app) {
 
         } finally {
           // Return requested 'stockData' object as 'response'
-          console.log(`response: `, response);
+          // console.log(`response: `, response);
           res.json(response);
         }
       } else if (Array.isArray(queryStock)) {
@@ -149,11 +149,12 @@ module.exports = function(app) {
 
         } catch (err) {
 
-          throw err
+          // throw err
+          response = 'Error finding info for stocks. Please try again!';
 
         } finally {
 
-          console.log(`response: `, response);
+          // console.log(`response: `, response);
           res.json(response);
 
         }

@@ -3,14 +3,54 @@ body {
   font-size: 16px; }
   body div.container {
     margin: 5rem auto; }
+    body div.container hr {
+      margin: 1.7rem 0; }
     body div.container h1 {
       font-size: 2.4rem; }
-    body div.container span#websiteLink {
-      color: #ee90c4; }
+    body div.container section#api-interface div.row {
+      display: flex;
+      flex-direction: column; }
+    body div.container section#api-interface h5 {
+      margin-bottom: 1rem; }
+    body div.container section#api-interface div#resultContainer {
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      border: 1px solid #99e6b9;
+      margin: 2rem 0;
+      background-color: #f2f2f2; }
+      body div.container section#api-interface div#resultContainer h5 {
+        text-align: center; }
+      body div.container section#api-interface div#resultContainer code {
+        font-size: 1.1rem;
+        margin: auto; }
+      body div.container section#api-interface div#resultContainer div#stock1, body div.container section#api-interface div#resultContainer div#stock2 {
+        margin: 0 2rem; }
+    body div.container section#api-interface button {
+      border: 1px solid lightgray;
+      border-radius: 3px;
+      padding: 0.5rem 2rem; }
+    body div.container a#websiteLink {
+      color: #32cd73; }
     body div.container div.row > div {
       margin: auto; }
     @media (min-width: 768px) {
       body div.container div.row {
         margin: 0; } }
+    body div.container section#footer {
+      margin: 1.6rem; }
+      body div.container section#footer div.row {
+        display: flex;
+        flex-direction: column;
+        text-align: center; }
+      body div.container section#footer a {
+        color: #32cd73; }
+
+@media (max-width: 768px) {
+  div#resultContainer {
+    padding: 1.5rem; } }
+@media (max-width: 992px) {
+  div#resultContainer {
+    padding: 2.3rem; } }
 
 /*# sourceMappingURL=style.css.map */

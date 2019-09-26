@@ -14,7 +14,7 @@ const fccTestingRoutes = require("./routes/fcctesting.js");
 const runner = require("./test-runner");
 
 if (process.env.NODE_ENV === "test") {
-  console.log(`Environment is set to 'test'!`);
+  // console.log(`Environment is set to 'test'!`);
   dotenv.config();
 }
 
@@ -70,8 +70,8 @@ app.use(function(req, res, next) {
 
 //Start our server and tests!
 app.listen(PORT || 3000, function() {
-  console.log("Listening on port: " + PORT);
-  console.log(`NODE_ENV: ${NODE_ENV}`);
+  // console.log("Listening on port: " + PORT);
+  // console.log(`NODE_ENV: ${NODE_ENV}`);
   if (NODE_ENV === "test") {
     console.log("Running Tests...");
     setTimeout(function() {

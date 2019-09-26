@@ -129,7 +129,7 @@ function StockHandler() {
   this.getStockLikes = function() {};
 
   this.fetchStockPrice = async function(name) {
-    // console.log(`this.fetchStockData - name: `, name);
+    console.log(`this.fetchStockData - name: ${name}`);
 
     try {
       let newPrice;
@@ -165,7 +165,8 @@ function StockHandler() {
       }
     } catch (err) {
       // throw Error(`Error finding info for that stock!`);
-      return 'No info found for that stock! Please try again.';
+      // return 'No info found for that stock! Please try again.';
+      throw err;
     }
   };
 
@@ -189,24 +190,19 @@ function StockHandler() {
 
     const dateRegex = /^(\d{4})-(\d{2})-(\d{2})$/;
     const lastMatches = last.match(dateRegex);
-    const todayMatches = today.match(dateRegex);
+    let todayMatches = today.match(dateRegex);
     const testMatches = "2019-05-10".match(dateRegex);
 
-    /*
-    TODO: Compare each index (after 0) of 'todayMatches'
-    if a 'today' value is newer than a 'lastUpdated' value
-    then return that the price is outdated and needs updating.
-    */
 
     let valid = false;
 
     todayMatches.forEach((match, index) => {
       if (index === 0) return;
       const curr = Number(match);
-      let last;
-      if(NODE_ENV === 'test') last = Number(testMatches[index]);
-      else if(NODE_ENV !== 'test') last = Number(lastMatches[index]);
-      if (curr > last) valid = true;
+      let prev;
+      if(NODE_ENV === 'test') prev = Number(testMatches[index]);
+      else if(NODE_ENV !== 'test') prev = Number(lastMatches[index]);
+      if (curr > prev) valid = true;
     });
 
     return valid;
